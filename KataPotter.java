@@ -17,6 +17,7 @@ public class KataPotter {
 
 	static public class BookCart {
 		ArrayList<Book> books;
+		int minSelectPackageIndex;
 		int totalBooks;
 
 		public BookCart() {
@@ -125,6 +126,12 @@ public class KataPotter {
 		}
 	}
 
+	/**
+	 * 打包组合(多种用途)
+	 * @author Laoniu
+	 * 
+	 *
+	 */
 	static public class PackegeCombo {
 
 		ArrayList<BookPackage> BookPackages;
@@ -171,6 +178,8 @@ public class KataPotter {
 
 		}
 	}
+	
+	
 
 	/**
 	 * 优惠组合 针对于一个购物车有多种优惠组合
@@ -197,12 +206,85 @@ public class KataPotter {
 	public KataPotter() {
 		// TODO Auto-generated constructor stub
 	}
+	
+	/**
+	 * 找出所有可能的选择组合
+	 * @param cart
+	 * @return
+	 */
+	public ArrayList<PackegeCombo> genAllPickAblePackage(BookCart cart)
+	{
+		ArrayList<PackegeCombo> pkgcmbs=new ArrayList<KataPotter.PackegeCombo>();
+		for(int i=1;i<=cart.books.size();i++)
+		{
+			BookCart cyc_cart=cart.copy();
+			ArrayList<BookPackage> pkgs=pickablePackegeFromBookCart(cyc_cart, i);
+			PackegeCombo pkgcmb=new PackegeCombo();
+			pkgcmb.BookPackages=pkgs;
+			pkgcmbs.add(pkgcmb);
+		}
+		return pkgcmbs;
+	}
+	
+	/**
+	 * 此优惠组合可以使用的打包方式
+	 * 
+	 * @return
+	 */
+	public ArrayList<PackegeCombo> pickAblePakegeCombo(
+			BookCart BookCart, StategyCombo strategyCombo,ArrayList<PackegeCombo> pkgcmbs) {
+		
+		ArrayList<BookCart> BookCarts = new ArrayList<BookCart>();
+		ArrayList<PackegeCombo> pkgcombos = new ArrayList<PackegeCombo>();
+		BookCarts.add(BookCart.copy());
+		int []minsel=new int[BookCart.books.size()];
+		
+		
+		for (int i = 0; i < strategyCombo.strategies.size(); i++) {
+			ArrayList<BookCart> newBookCarts = new ArrayList<BookCart>();
+			ArrayList<PackegeCombo> newPkgCombos = new ArrayList<PackegeCombo>();
+			int curPackageIndex= strategyCombo.strategies.get(i).bookCount-1;
+			
+			for (int j = BookCarts.size() - 1; j >= 0; j--) {
+				 
+				ArrayList<BookPackage> pkgs=pkgcmbs.get(curPackageIndex).BookPackages;
+				for(int k=minsel[curPackageIndex];k<pkgs.size();k++)
+				{
+					BookCart newCart = pickPackegeFromBookCart(BookCarts.get(j), pkgs.get(k));
+					
+					if(newCart!=null)
+					{
+						
+						newBookCarts.add(newCart);
+						PackegeCombo pkgcmb = (i == 0) ? new PackegeCombo()
+						: pkgcombos.get(j).copy();
+						minsel[curPackageIndex]=i;
+						BookPackage pkg=pkgs.get(k).copy();
+						pkgcmb.add(pkg);
+						pkgcmb.totalPrice += strategyCombo.totalPrice;
+						newPkgCombos.add(pkgcmb);
+					}
+				}
+				
+				
+			}
+			// 购物车无法再操作了 推出程序
+			if (newBookCarts.size() == 0) {
+				return null;// 表示没有结果
+			}
+			BookCarts = newBookCarts;
+			pkgcombos = newPkgCombos;
+			
+		}
+		return pkgcombos;
+	}
 
 	/**
 	 * 此优惠组合可以使用的打包方式
 	 * 
 	 * @return
 	 */
+	/*
 	public ArrayList<PackegeCombo> pickAblePakegeComboWithStategyComboFromBookCart(
 			BookCart BookCart, StategyCombo strategyCombo) {
 
@@ -251,6 +333,9 @@ public class KataPotter {
 		}
 		return pkgcombos;
 	}
+	*/
+
+			
 
 	/**
 	 * 按规定数量可从购物车中取出的书籍优惠包
@@ -321,6 +406,8 @@ public class KataPotter {
 
 		return bkCart;
 	}
+	
+	
 
 	/**
 	 * @param BookCart
@@ -404,30 +491,31 @@ public class KataPotter {
 	 * @return
 	 */
 	public ArrayList<PackegeCombo> getTheCheapestPurchasePackegs(
-			BookCart BookCart, ArrayList<Strategy> avalibleStrategies) {
+			BookCart cart, ArrayList<Strategy> avalibleStrategies) {
 		// 获得所有可能的优惠组合
 		ArrayList<StategyCombo> stragycombos = allUseAbleStrategyComboFromBookCart(
-				BookCart, avalibleStrategies);
+				cart, avalibleStrategies);
 		// 对优惠组合进行排序
 		stragycombos = sortStrategyCombos(stragycombos);
+		ArrayList<PackegeCombo> pregen_pkgcmb=genAllPickAblePackage(cart);
 
-		ArrayList<PackegeCombo> packegeCombos = new ArrayList<PackegeCombo>();
+		ArrayList<PackegeCombo> ret_packegeCombos = new ArrayList<PackegeCombo>();
 		for (int i = 0; i < stragycombos.size(); i++) {
 			// 查看此优惠组合是否可以打包成功
-			ArrayList<PackegeCombo> packegeCombos_i = pickAblePakegeComboWithStategyComboFromBookCart(
-					BookCart, stragycombos.get(i));
+			ArrayList<PackegeCombo> packegeCombos_i = pickAblePakegeCombo(
+					cart, stragycombos.get(i),pregen_pkgcmb);
 			if (packegeCombos_i != null) {
-				packegeCombos.addAll(packegeCombos_i);
+				ret_packegeCombos.addAll(packegeCombos_i);
 			}
 			// 由于策略是按价格排序的 如果下一个策略的价格大于本策略且本策略已经找到结果 那么循环结束
 			if (i < stragycombos.size() - 1
-					&& packegeCombos.size() > 0
+					&& ret_packegeCombos.size() > 0
 					&& stragycombos.get(i + 1).totalPrice > stragycombos.get(i).totalPrice) {
 				break;
 			}
 
 		}
-		return packegeCombos;
+		return ret_packegeCombos;
 	}
 
 	/**

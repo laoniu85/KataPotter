@@ -37,6 +37,16 @@ public class testKataPotter {
 		return cart;
 	}
 	
+	public BookCart getTestCart4() {
+		BookCart cart = new BookCart();
+		cart.addBook(new Book("A", 1));
+		cart.addBook(new Book("B", 1));
+		cart.addBook(new Book("C", 1));
+		cart.addBook(new Book("D", 1));
+		cart.addBook(new Book("E", 1));
+		return cart;
+	}
+	
 	public BookCart getTestCart2() {
 		BookCart cart = new BookCart();
 		cart.addBook(new Book("A", 2));
@@ -233,6 +243,28 @@ public class testKataPotter {
 		pkgs = kataPotter.pickablePackegeFromBookCart(cart, 5);
 		assertTrue(pkgs == null || pkgs.size() == 0);
 
+	}
+	@Test 
+	public void testGenAllPackage()
+	{
+		KataPotter kataPotter = new KataPotter();
+		BookCart cart = getTestCart4();
+		ArrayList<BookPackage> pkgs = kataPotter.pickablePackegeFromBookCart(
+				cart, 5);
+		printPackages(pkgs);
+		 pkgs = kataPotter.pickablePackegeFromBookCart(
+				cart, 4);
+		printPackages(pkgs);
+		pkgs = kataPotter.pickablePackegeFromBookCart(
+				cart, 3);
+		printPackages(pkgs);
+		pkgs = kataPotter.pickablePackegeFromBookCart(
+				cart, 2);
+		printPackages(pkgs);
+		pkgs = kataPotter.pickablePackegeFromBookCart(
+				cart, 1);
+		printPackages(pkgs);
+		
 	}
 
 }
