@@ -279,63 +279,7 @@ public class KataPotter {
 		return pkgcombos;
 	}
 
-	/**
-	 * 此优惠组合可以使用的打包方式
-	 * 
-	 * @return
-	 */
-	/*
-	public ArrayList<PackegeCombo> pickAblePakegeComboWithStategyComboFromBookCart(
-			BookCart BookCart, StategyCombo strategyCombo) {
-
-		ArrayList<BookCart> BookCarts = new ArrayList<BookCart>();
-		ArrayList<PackegeCombo> pkgcombos = new ArrayList<PackegeCombo>();
-		BookCarts.add(BookCart.copy());
-
-		for (int i = 0; i < strategyCombo.strategies.size(); i++) {
-			ArrayList<BookCart> newBookCarts = new ArrayList<BookCart>();
-			ArrayList<PackegeCombo> newPkgCombos = new ArrayList<PackegeCombo>();
-			for (int j = BookCarts.size() - 1; j >= 0; j--) {
-				ArrayList<BookPackage> pkgs = pickablePackegeFromBookCart(
-						BookCarts.get(j),
-						strategyCombo.strategies.get(i).bookCount);
-				// 剪除没有结果的分支
-				if (pkgs == null || pkgs.size() == 0) {
-					BookCarts.remove(j);
-				} else {
-					// BookCart分裂为pkgs个分支 newPkgCombos和BookCarts同时分裂
-					for (int k = 0; k < pkgs.size(); k++) {
-						// 从分支对应的
-						BookCart newCart = pickPackegeFromBookCart(BookCarts
-								.get(j).copy(), pkgs.get(k));
-
-						if (newCart == null) {
-							continue;
-						}
-						newBookCarts.add(newCart);
-						PackegeCombo pkgcmb = (i == 0) ? new PackegeCombo()
-								: pkgcombos.get(j).copy();
-						;
-						pkgcmb.add(pkgs.get(k));
-						pkgcmb.totalPrice = strategyCombo.totalPrice;
-						newPkgCombos.add(pkgcmb);
-
-					}
-				}
-
-			}
-			// 购物车无法再操作了 推出程序
-			if (newBookCarts.size() == 0) {
-				return null;// 表示没有结果
-			}
-			BookCarts = newBookCarts;
-			pkgcombos = newPkgCombos;
-		}
-		return pkgcombos;
-	}
-	*/
-
-			
+	
 
 	/**
 	 * 按规定数量可从购物车中取出的书籍优惠包
